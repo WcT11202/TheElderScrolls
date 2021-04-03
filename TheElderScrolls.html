@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- jQuery Modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <style>
+        #maincontent {
+            margin-top: 1%;
+            background-color: rgb(209, 209, 209);
+            padding: 1.5%;
+        }
+
+        .form-control {
+            resize: none;
+            width: 300px;
+            height: 500px;
+        }
+
+        #canvas {
+
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            width: 200px;
+            height: 150px;
+        }
+
+        #finish,
+        #finish:hover {
+            text-decoration: none;
+
+        }
+
+        #result {
+            width: 440px;
+            height: 330px;
+        }
+
+        .selection {
+            border: rgb(166, 166, 231) 2px solid;
+            padding: 1%;
+            border-radius: 25px;
+
+        }
+
+        option {
+            text-align: center;
+        }
+        ul>li{font-size: medium;}
+    </style>
+</head>
+
+<body>
+    <div id="maincontent" class="container">
+        <div class="row">
+            <div>
+                <div class="col-md-8 col-sm-8">
+                    <canvas id="canvas" width=800 height=600 style="border:1px solid #000000;"></canvas>
+                    <canvas id="canvasR" width=800 height=600 style="display: none;"></canvas>
+                </div>
+                <div class="col-md-4 col-sm-4 selection">
+                    <div><label for="Textarea1">請輸入內容</label>
+                        <textarea class="form-control" id="Textarea1"></textarea>
+                        <select style="margin-top: 1%;" name="contentsize" id="contentsize">
+                            <option value="60px">小</option>
+                            <option value="80px">中</option>
+                            <option value="100px">大</option>
+                            <option value="120px">很大</option>
+                        </select>
+                        <input id="contentcolor" type="color">
+                        <select style="margin-top: 1%;" name="fontface" id="fontface">
+                            <option style="font-family:Microsoft JhengHei;" value="Microsoft JhengHei">微軟正黑體</option>
+                            <option style="font-family:DFKai-sb;" value="DFKai-sb">標楷體</option>
+                            <option style="font-family:fantasy;" value="fantasy">Fantasy Font</option>
+                            <option style="font-family:monospace;" value="monospace">Monospace Font</option>
+                        </select>
+                        <br>
+                        <button style="margin-top: 1%;" class="btn btn-primary" id="submit">確認</button>
+                        <a id="finish" style="margin-top:1%" class="btn btn-success" href="#ex1" rel="modal:open">完成</a>
+                        <div >
+                            <ul>
+                                <h3>使用說明</h3>
+                                <li>選取下方欲製作之原圖。</li>
+                                <li>在上方文字框內輸入內容，</br>選擇字體大小、顏色、字型，按下確認送出。</li>
+                                <li>可於左側圖案上將文字框拖動至想要的位置。</li>
+                                <li>按下完成可進行下載。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                
+                
+
+
+
+
+                <div id="ex1" class="modal container">
+                    <p style="font-size: large;font-family: Georgia, 'Times New Roman', Times, serif;">預覽圖
+
+                    </p><img id="result" src="" alt="">
+                    <hr>
+                    <div style="float:right">
+                        <a class="btn btn-success" id="aDownload" href="#" download="">下載</a>
+                        <a class="btn btn-danger" href="#" rel="modal:close">關閉</a>
+                    </div>
+
+                </div>
+
+                <!-- Link to open the modal -->
+
+            </div>
+
+        </div>
+        <hr>
+        <div class="row container">
+            <div class="col-md-3 col-xs-6"><img class="material" src="./img/sky.jpg" alt=""></div>
+            <div class="col-md-3 col-xs-6"><img class="material" src="./img/beach.jpg" alt=""></div>
+            <div class="col-md-3 col-xs-6"><img class="material" src="./img/flower.png" alt=""></div>
+            <div class="col-md-3 col-xs-6"><img class="material" src="./img/lotus.jpg" alt=""></div>
+        </div>
+
+
+        <script>
+            window.onload = init;
+
+            function init() {
+                // canvas related variables
+                var canvas = document.getElementById("canvas");
+                var ctx = canvas.getContext("2d");
+                var ctxR = canvasR.getContext("2d");
+                // variables used to get mouse position on the canvas
+                var $canvas = $("#canvas");
+                var canvasOffset = $canvas.offset();
+                var offsetX = canvasOffset.left;
+                var offsetY = canvasOffset.top;
+                var scrollX = $canvas.scrollLeft();
+                var scrollY = $canvas.scrollTop();
+                //
+                var imageObj = new Image();
+                imageObj.src = './img/sky.jpg';
+                var imgData = ctx.getImageData(0, 0, 800, 600);
+                var data = imgData.data;
+                ctx.drawImage(imageObj, 0, 0, 800, 600);
+
+                $('.material').on('click', function () {
+                    imageObj.src = $(this).attr("src")
+                    //console.log(imageObj.src)
+                    ctx.drawImage(imageObj, 0, 0, 800, 600);
+
+                    aDownload.href = canvas.toDataURL("image/png");
+                    console.log(aDownload.href)
+                })
+                // variables to save last mouse position
+                // used to see how far the user dragged the mouse
+                // and then move the text by that distance
+                var startX;
+                var startY;
+
+                // an array to hold text objects
+                var texts = [];
+
+                // this var will hold the index of the hit-selected text
+                var selectedText = -1;
+
+                // clear the canvas & redraw all texts
+                function draw() {
+                    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imageObj, 0, 0, 800, 600);
+                    for (var i = 0; i < texts.length; i++) {
+                        var text = texts[i];
+                        ctx.fillText(text.text, text.x, text.y);
+                        ctx.closePath();
+                    }
+
+                }
+
+                // test if x,y is inside the bounding box of texts[textIndex]
+                function textHittest(x, y, textIndex) {
+                    var text = texts[textIndex];
+                    return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height && y <= text.y);
+                }
+
+                // handle mousedown events
+                // iterate through texts[] and see if the user
+                // mousedown'ed on one of them
+                // If yes, set the selectedText to the index of that text
+                function handleMouseDown(e) {
+                    e.preventDefault();
+                    startX = parseInt(e.pageX - offsetX);
+                    startY = parseInt(e.pageY - offsetY);
+                    // Put your mousedown stuff here
+                    for (var i = 0; i < texts.length; i++) {
+                        if (textHittest(startX, startY, i)) {
+                            selectedText = i;
+                        }
+                    }
+
+                }
+
+                // done dragging
+                function handleMouseUp(e) {
+                    e.preventDefault();
+                    selectedText = -1;
+                }
+
+                // also done dragging
+                function handleMouseOut(e) {
+                    e.preventDefault();
+                    selectedText = -1;
+                }
+
+                // handle mousemove events
+                // calc how far the mouse has been dragged since
+                // the last mousemove event and move the selected text
+                // by that distance
+                function handleMouseMove(e) {
+                    if (selectedText < 0) {
+
+                        return;
+                    }
+                    e.preventDefault();
+                    mouseX = parseInt(e.pageX - offsetX);
+                    mouseY = parseInt(e.pageY - offsetY);
+
+                    // Put your mousemove stuff here
+                    var dx = mouseX - startX;
+                    var dy = mouseY - startY;
+                    startX = mouseX;
+                    startY = mouseY;
+
+                    var text = texts[selectedText];
+
+                    text.x += dx;
+                    text.y += dy;
+                    //console.log(canvas.toDataURL("image/png"))
+
+                    draw();
+
+                }
+
+                // listen for mouse events
+                $("#canvas").mousedown(function (e) {
+                    handleMouseDown(e);
+                });
+                $("#canvas").mousemove(function (e) {
+                    handleMouseMove(e);
+                });
+                $("#canvas").mouseup(function (e) {
+                    handleMouseUp(e);
+                });
+                $("#canvas").mouseout(function (e) {
+                    handleMouseOut(e);
+                });
+
+                $("#submit").click(function () {
+                    //content option
+                    var fontsize = $('#contentsize').val();
+                    console.log(fontsize);
+                    var fontcolor = $('#contentcolor').val();
+                    console.log(fontcolor);
+                    var fontface = $('#fontface').val();
+                    console.log(fontface);
+                    // calc the y coordinate for this text on the canvas
+                    var y = texts.length * 20 + 20;
+
+                    // get the text from the input element
+                    var text = {
+                        text: $("#Textarea1").val().replace(/(\r\n|\n|\r)/gm, ""),
+                        x: 0,
+                        y: y + 40
+                    };
+
+                    console.log(text)
+                    // calc the size of this text for hit-testing purposes
+                    ctx.font = `${fontsize} ${fontface}`;
+                    ctx.fillStyle = `${fontcolor}`;
+                    text.width = ctx.measureText(text.text).width;
+                    text.height = 80;
+                    //parseInt(fontsize)
+                    // put this new text in the texts array
+                    texts.push(text);
+                    console.log(texts)
+                    // redraw everything
+                    draw();
+
+                    $("#Textarea1").val("");
+
+
+                });
+                //console.log(canvas.toDataURL("image/png"));
+                //imgView.src = canvas.toDataURL("image/png");
+
+                $('.btn').on('click', function () {
+                    ctxR.drawImage(canvas, 0, 0);
+                    aDownload.href = canvasR.toDataURL("image/png");
+                    $('#result').attr("src", canvasR.toDataURL("image/png"))
+                    location.href = '#ex1';
+                })
+
+
+            };
+        </script>
+</body>
+
+</html>
